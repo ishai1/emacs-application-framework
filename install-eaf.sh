@@ -88,13 +88,21 @@ https://github.com/manateelazycat/emacs-application-framework for the script to 
     exit 1
 fi
 
+INVENV_TF=$(python -c 'import sys; get_base_prefix_compat = lambda: getattr(sys, "base_prefix", None) or getattr(sys, "real_prefix", None) or sys.prefix; in_virtualenv = lambda : get_base_prefix_compat() != sys.prefix; print(in_virtualenv())')
+USER_FLAGS=
+if [ $INVENV_TF == "FALSE" ]
+then
+    USER_FLAGS="--user"
+fi
+
+
 # Python dependencies
 if [ $IGNORE_PY_DEPS ]; then
     :
 elif [ "$(command -v pip3)" ]; then
-    pip3 install --user pymupdf epc retrying pytaglib psutil || { echo "[EAF] Failed to install dependency with pip3."; exit 1;}
+    pip3 install ${USER_FLAGS} pymupdf epc retrying pytaglib psutil || { echo "[EAF] Failed to install dependency with pip3."; exit 1;}
 elif [ "$(command -v pip)" ]; then
-    pip install --user pymupdf epc retrying pytaglib psutil || { echo "[EAF] Failed to install dependency with pip."; exit 1;}
+    pip install ${USER_FLAGS} pymupdf epc retrying pytaglib psutil || { echo "[EAF] Failed to install dependency with pip."; exit 1;}
 else
     echo "[EAF] Cannot find pip. Please install it before launching the script again."
     exit 1
